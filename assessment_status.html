@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lumeir — Assessment status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Lumeir tokens (shared) ---------- */
+  :root {
+    --color-primary:         #03A582;
+    --color-primary-deep:    #058569;
+    --color-accent-bright:   #46FFCA;
+    --color-accent-mint:     #26BAB5;
+    --color-sidebar:         #E9FAF6;
+    --color-sidebar-border:  #D6F1EA;
+    --color-mint-hover:      #F4FFFD;
+    --color-surface:         #FFFFFF;
+    --color-text:            #020618;
+    --color-text-on-dark:    #FFFFFF;
+    --color-text-muted:      #62748E;
+    --color-text-placeholder:#9CA3AF;
+    --color-border-soft:     #E2E8F0;
+    --color-border:          #CBD5E1;
+    --color-bg-page:         #F8FAFC;
+    --color-warn-bg:         #FEF3C7;
+    --color-warn-fg:         #B45309;
+    --color-danger-bg:       #FEE2E2;
+    --color-danger-fg:       #B91C1C;
+
+    --shadow-button: 0px 2px 7px rgba(96, 96, 96, 0.10);
+    --shadow-cta:    0px 4px 7px rgba(63, 255, 200, 0.20);
+    --shadow-card:   0px 1px 3px rgba(0, 0, 0, 0.04);
+
+    --r-md:    8px;
+    --r-lg:    12px;
+    --r-pill:  100px;
+
+    --font-display: 'Manrope', 'Inter', system-ui, sans-serif;
+    --font-body:    'Inter', system-ui, sans-serif;
+
+    --t-fast: 200ms;
+    --ease:   cubic-bezier(.22, .9, .3, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: var(--font-body); color: var(--color-text); background: var(--color-bg-page); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+  .app { display: flex; min-height: 100vh; }
+
+  /* ---------- Sidebar (shared) ---------- */
+  .sidebar { width: 189px; background: var(--color-sidebar); padding: 20px; flex-shrink: 0; display: flex; flex-direction: column; gap: 36px; }
+  .sidebar-logo { display: block; width: 117px; height: 36px; }
+  .sidebar-logo svg { width: 100%; height: 100%; display: block; }
+  .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--r-md); font-family: var(--font-body); font-weight: 500; font-size: 14px; color: var(--color-text); text-decoration: none; cursor: pointer; transition: background-color var(--t-fast) var(--ease); }
+  .nav-item:hover { background: var(--color-mint-hover); }
+  .nav-item.active { background: var(--color-surface); color: var(--color-primary-deep); font-weight: 600; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  /* ---------- Top bar (shared) ---------- */
+  .topbar { height: 88px; display: flex; align-items: center; padding: 0 32px; gap: 16px; }
+  .sidebar-toggle { width: 36px; height: 36px; border: 1px solid var(--color-border-soft); background: transparent; border-radius: var(--r-md); cursor: pointer; display: grid; place-items: center; color: var(--color-text-muted); transition: background-color var(--t-fast) var(--ease); }
+  .sidebar-toggle:hover { background: var(--color-mint-hover); }
+  .sidebar-toggle svg { width: 20px; height: 20px; }
+  .topbar-spacer { flex: 1; }
+  .search-top { width: 320px; height: 40px; border: 1px solid var(--color-border-soft); border-radius: var(--r-pill); background: var(--color-surface); display: flex; align-items: center; padding: 0 16px; gap: 10px; color: var(--color-text-muted); }
+  .search-top svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .search-top input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-family: var(--font-body); font-size: 14px; color: var(--color-text); }
+  .search-top input::placeholder { color: var(--color-text-muted); }
+  .notif-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; cursor: pointer; color: var(--color-text-muted); display: grid; place-items: center; position: relative; transition: background-color var(--t-fast) var(--ease); }
+  .notif-btn:hover { background: var(--color-mint-hover); }
+  .notif-btn svg { width: 20px; height: 20px; }
+  .notif-dot { position: absolute; top: 8px; right: 9px; width: 8px; height: 8px; background: var(--color-primary); border-radius: 50%; border: 2px solid var(--color-bg-page); }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-primary-deep); color: var(--color-text-on-dark); font-family: var(--font-body); font-weight: 600; font-size: 14px; display: grid; place-items: center; cursor: pointer; border: none; }
+
+  /* ---------- Page ---------- */
+  .page { width: 1011px; max-width: 100%; margin: 0 auto; padding: 16px 40px 32px; flex: 1; display: flex; flex-direction: column; gap: 24px; }
+
+  .page-title { font-family: var(--font-display); font-size: 30px; line-height: 36px; font-weight: 700; color: var(--color-text); }
+  .page-subtitle { font-family: var(--font-body); font-size: 15px; line-height: 24px; color: var(--color-text-muted); max-width: 760px; margin-top: -8px; }
+
+  /* ---------- Grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ---------- Response status card ---------- */
+  .status-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-card);
+    padding: 24px 28px;
+  }
+  .status-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .status-count {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .status-count .of { color: var(--color-text-muted); font-weight: 600; font-size: 20px; }
+
+  .pill {
+    height: 26px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pill::before {
+    content: "";
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  .pill.mint   { background: var(--color-sidebar);   color: var(--color-primary-deep); }
+  .pill.warn   { background: var(--color-warn-bg);   color: var(--color-warn-fg); }
+  .pill.danger { background: var(--color-danger-bg); color: var(--color-danger-fg); }
+
+  /* ---------- Progress bar ---------- */
+  .pbar {
+    height: 6px;
+    border-radius: var(--r-pill);
+    background: var(--color-border-soft);
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .pbar-fill { height: 100%; background: var(--color-primary); border-radius: var(--r-pill); transition: width var(--t-fast) var(--ease); }
+
+  /* ---------- Response list ---------- */
+  .resp-list { display: flex; flex-direction: column; }
+  .resp-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+  .resp-row:last-child { border-bottom: none; }
+  .resp-info { flex: 1; min-width: 0; }
+  .resp-name {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 2px;
+  }
+  .resp-meta {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .resp-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--color-border); }
+
+  .resp-status {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: grid; place-items: center;
+    background: var(--color-primary);
+    color: var(--color-text-on-dark);
+  }
+  .resp-status svg { width: 16px; height: 16px; }
+  .resp-status.pending {
+    background: var(--color-bg-page);
+    color: var(--color-text-placeholder);
+    border: 1.5px solid var(--color-border-soft);
+  }
+
+  /* ---------- Quick actions card ---------- */
+  .qa-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-card);
+    padding: 24px 28px;
+  }
+  .qa-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 18px;
+  }
+  .qa-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .qa-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: var(--r-md);
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background-color var(--t-fast) var(--ease);
+  }
+  .qa-item:hover { background: var(--color-mint-hover); }
+  .qa-icon {
+    width: 40px; height: 40px;
+    border-radius: var(--r-md);
+    background: var(--color-sidebar);
+    color: var(--color-primary-deep);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  }
+  .qa-item:hover .qa-icon { background: var(--color-primary); color: var(--color-text-on-dark); }
+  .qa-icon svg { width: 20px; height: 20px; }
+  .qa-body { flex: 1; min-width: 0; }
+  .qa-name {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 2px;
+  }
+  .qa-meta {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+  .qa-chev {
+    color: var(--color-text-muted);
+    display: grid; place-items: center;
+    transition: transform var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  }
+  .qa-item:hover .qa-chev { transform: translateX(2px); color: var(--color-primary-deep); }
+  .qa-chev svg { width: 16px; height: 16px; }
+
+  /* ---------- What happens next ---------- */
+  .next-card {
+    background: var(--color-sidebar);
+    border: 1px solid var(--color-sidebar-border);
+    border-radius: var(--r-lg);
+    padding: 18px 22px;
+  }
+  .next-head { margin-bottom: 10px; }
+  .next-text {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--color-text);
+  }
+
+  /* ---------- Footer ---------- */
+  .page-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+  .btn { height: 48px; padding: 0 20px; border-radius: var(--r-md); font-family: var(--font-body); font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none; text-decoration: none; transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease); }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border-soft); box-shadow: var(--shadow-button); }
+  .btn-secondary:hover { background: var(--color-mint-hover); }
+  .btn-primary { background: var(--color-primary); color: var(--color-text-on-dark); box-shadow: var(--shadow-cta); }
+  .btn-primary:hover { background: var(--color-primary-deep); }
+  .btn-primary:active, .btn-secondary:active { transform: scale(0.98); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" role="navigation" aria-label="Primary">
+    <a class="sidebar-logo" href="welcome_3.html" aria-label="Lumeir home">
+      <svg width="117" height="36" viewBox="0 0 117 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M7.13513 26.337C7.25151 31.6435 13.1675 33.9179 17.6119 32.4069C17.7164 32.3714 17.7914 32.5036 17.7105 32.5765C9.86922 39.4552 -2.72418 31.4738 0.528719 21.2476C3.00834 14.3512 8.85133 11.5441 8.79807 2.85855C8.7744 2.12867 8.40354 1.05752 8.10765 0.32764C7.94194 -0.0806984 8.01098 -0.112261 8.24968 0.26057C8.36409 0.438109 8.47456 0.615647 8.55544 0.753733C14.3886 11.5323 7.75849 15.8366 7.14696 25.763C7.13118 25.982 7.14696 26.1181 7.1371 26.339" fill="url(#st-lumeir-green)"/>
+        <path d="M21.4585 24.2114C21.4585 26.4247 20.8253 28.2593 20.0362 29.6066C19.4937 30.5318 18.5863 31.1867 17.5408 31.4274C15.288 31.9442 12.5401 31.8692 10.891 30.7586C8.54945 29.1805 8.24566 26.336 8.2062 25.6258C8.20226 25.5528 8.27722 25.4995 8.34429 25.5311C8.81575 25.7481 10.388 26.3675 12.1318 25.8744C13.994 25.3496 16.4361 23.1087 16.2783 20.0984C16.0199 16.017 13.126 14.7308 13.9999 9.63351C14.0196 9.5191 14.1853 9.52896 14.1932 9.64338C14.71 15.8414 21.6972 16.9737 21.4585 24.2154V24.2114Z" fill="url(#st-lumeir-teal)"/>
+        <path d="M29.8009 11.4247H34.0444V32.7616H29.8009V11.4247Z" fill="#058569"/>
+        <path d="M51.8792 32.7616H47.845V30.6099H47.7553C47.2174 31.5064 46.5201 32.1539 45.6635 32.5524C44.8068 32.9508 43.9302 33.15 43.0337 33.15C41.8981 33.15 40.9618 33.0006 40.2247 32.7018C39.5075 32.403 38.9397 31.9846 38.5213 31.4467C38.1029 30.8888 37.8041 30.2215 37.6248 29.4445C37.4654 28.6476 37.3857 27.771 37.3857 26.8147V17.3118H41.6292V26.0378C41.6292 27.3128 41.8284 28.2691 42.2269 28.9066C42.6253 29.5242 43.3325 29.833 44.3486 29.833C45.5041 29.833 46.3408 29.4943 46.8588 28.8169C47.3768 28.1196 47.6358 26.9841 47.6358 25.4102V17.3118H51.8792V32.7616Z" fill="#058569"/>
+        <path d="M55.2194 17.3118H59.2238V19.4036H59.2836C59.8414 18.6067 60.5088 17.9891 61.2858 17.5508C62.0827 17.1126 62.9891 16.8934 64.0052 16.8934C64.9814 16.8934 65.8679 17.0827 66.6648 17.4612C67.4816 17.8397 68.0992 18.5071 68.5176 19.4634C68.9758 18.786 69.5934 18.1884 70.3704 17.6704C71.1673 17.1524 72.1036 16.8934 73.1794 16.8934C73.9963 16.8934 74.7533 16.993 75.4506 17.1922C76.1479 17.3915 76.7455 17.7102 77.2436 18.1485C77.7416 18.5868 78.1301 19.1646 78.409 19.8818C78.688 20.579 78.8274 21.4257 78.8274 22.4219V32.7616H74.584V24.0057C74.584 23.4877 74.564 22.9996 74.5242 22.5414C74.4843 22.0832 74.3748 21.6847 74.1955 21.3461C74.0162 21.0074 73.7472 20.7384 73.3886 20.5392C73.0499 20.34 72.5818 20.2404 71.9841 20.2404C71.3864 20.2404 70.8983 20.3599 70.5198 20.599C70.1612 20.8181 69.8723 21.1169 69.6532 21.4955C69.4539 21.8541 69.3145 22.2724 69.2348 22.7506C69.175 23.2088 69.1452 23.677 69.1452 24.1551V32.7616H64.9017V24.0953C64.9017 23.6371 64.8917 23.1889 64.8718 22.7506C64.8519 22.2924 64.7622 21.874 64.6029 21.4955C64.4634 21.1169 64.2144 20.8181 63.8558 20.599C63.5171 20.3599 63.0091 20.2404 62.3317 20.2404C62.1325 20.2404 61.8635 20.2902 61.5248 20.3898C61.2061 20.4695 60.8873 20.6388 60.5686 20.8978C60.2697 21.1369 60.0107 21.4955 59.7916 21.9736C59.5725 22.4318 59.4629 23.0394 59.4629 23.7965V32.7616H55.2194V17.3118Z" fill="#058569"/>
+        <path d="M92.5813 23.3781C92.3821 22.3023 92.0235 21.4855 91.5055 20.9277C91.0075 20.3699 90.2404 20.0909 89.2045 20.0909C88.5271 20.0909 87.9593 20.2105 87.5011 20.4495C87.0628 20.6687 86.7042 20.9476 86.4253 21.2863C86.1663 21.625 85.9771 21.9836 85.8575 22.3621C85.7579 22.7406 85.6981 23.0793 85.6782 23.3781H92.5813ZM85.6782 26.0676C85.738 27.4423 86.0866 28.4384 86.7241 29.056C87.3617 29.6736 88.2781 29.9824 89.4734 29.9824C90.3301 29.9824 91.0672 29.7732 91.6848 29.3548C92.3024 28.9165 92.6809 28.4583 92.8204 27.9802H96.5558C95.9582 29.833 95.0417 31.1578 93.8065 31.9547C92.5714 32.7516 91.0772 33.15 89.324 33.15C88.1087 33.15 87.013 32.9608 86.0368 32.5823C85.0606 32.1838 84.2338 31.626 83.5565 30.9088C82.8791 30.1916 82.3512 29.3349 81.9727 28.3388C81.6141 27.3427 81.4348 26.2469 81.4348 25.0516C81.4348 23.8961 81.624 22.8203 82.0025 21.8242C82.3811 20.8281 82.919 19.9714 83.6163 19.2542C84.3135 18.5171 85.1403 17.9393 86.0966 17.521C87.0728 17.1026 88.1486 16.8934 89.324 16.8934C90.6389 16.8934 91.7844 17.1524 92.7606 17.6704C93.7368 18.1684 94.5337 18.8458 95.1513 19.7025C95.7888 20.5591 96.247 21.5353 96.5259 22.631C96.8049 23.7268 96.9045 24.8723 96.8248 26.0676H85.6782Z" fill="#058569"/>
+        <path d="M99.4611 17.3118H103.705V32.7616H99.4611V17.3118Z" fill="#058569"/>
+        <path d="M107.046 17.3118H111.08V20.1806H111.14C111.339 19.7025 111.608 19.2642 111.947 18.8657C112.285 18.4473 112.674 18.0987 113.112 17.8198C113.551 17.521 114.019 17.2919 114.517 17.1325C115.015 16.9731 115.533 16.8934 116.071 16.8934C116.35 16.8934 116.658 16.9432 116.997 17.0428V20.9874C116.798 20.9476 116.559 20.9177 116.28 20.8978C116.001 20.858 115.732 20.838 115.473 20.838C114.696 20.838 114.039 20.9675 113.501 21.2265C112.963 21.4855 112.525 21.8441 112.186 22.3023C111.867 22.7406 111.638 23.2586 111.499 23.8563C111.359 24.4539 111.289 25.1014 111.289 25.7987V32.7616H107.046V17.3118Z" fill="#058569"/>
+        <path d="M104.16 12.5893C104.16 14.0076 103.01 15.1574 101.591 15.1574C100.173 15.1574 99.0233 14.0076 99.0233 12.5893C99.0233 11.1709 100.173 10.0211 101.591 10.0211C103.010 10.0211 104.16 11.1709 104.16 12.5893Z" fill="#058569"/>
+        <defs>
+          <linearGradient id="st-lumeir-green" x1="8.87385" y1="0" x2="8.87385" y2="35.15" gradientUnits="userSpaceOnUse">
+            <stop offset="0.327944" stop-color="#46FFCA"/><stop offset="1" stop-color="#03A582"/>
+          </linearGradient>
+          <linearGradient id="st-lumeir-teal" x1="14.7514" y1="9.55941" x2="14.7514" y2="31.6819" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#0E7F95"/><stop offset="1" stop-color="#38EFF5"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </a>
+
+    <nav>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a></li>
+        <li><a href="#" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Sessions
+        </a></li>
+        <li><a href="role_setup.html" class="nav-item active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+          Assessments
+        </a></li>
+        <li><a href="#" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Notes
+        </a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <header class="topbar">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </button>
+      <div class="topbar-spacer"></div>
+      <label class="search-top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search" />
+      </label>
+      <button class="notif-btn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot" aria-hidden="true"></span>
+      </button>
+      <button class="avatar" aria-label="Account: SL">SL</button>
+    </header>
+
+    <div class="page">
+
+      <h1 class="page-title">All 3 responses are submitted</h1>
+      <p class="page-subtitle">Move onto the next step to synthesize themes across the responses.</p>
+
+      <div class="grid">
+
+        <!-- LEFT: Response status -->
+        <section class="status-card" aria-label="Response status">
+          <div class="status-head">
+            <div class="status-count">3<span class="of"> / 3</span></div>
+            <span class="pill mint">Complete</span>
+          </div>
+          <div class="pbar"><div class="pbar-fill" style="width:100%"></div></div>
+
+          <div class="resp-list">
+            <div class="resp-row">
+              <div class="resp-info">
+                <div class="resp-name">Anonymous</div>
+                <div class="resp-meta">Submitted 12 min ago</div>
+              </div>
+              <div class="resp-status" aria-label="Submitted">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div class="resp-row">
+              <div class="resp-info">
+                <div class="resp-name">Anonymous</div>
+                <div class="resp-meta">Submitted 1 hour ago</div>
+              </div>
+              <div class="resp-status" aria-label="Submitted">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div class="resp-row">
+              <div class="resp-info">
+                <div class="resp-name">Anonymous</div>
+                <div class="resp-meta">Submitted 3 hours ago</div>
+              </div>
+              <div class="resp-status" aria-label="Submitted">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT: Quick actions + Next -->
+        <div style="display:flex; flex-direction:column; gap:16px;">
+
+          <section class="qa-card" aria-label="Quick actions">
+            <h2 class="qa-title">Quick actions</h2>
+            <div class="qa-list">
+
+              <a class="qa-item" href="#">
+                <div class="qa-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+                <div class="qa-body">
+                  <div class="qa-name">Send a reminder</div>
+                  <div class="qa-meta">Nudge teammates who haven't responded</div>
+                </div>
+                <div class="qa-chev" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </a>
+
+              <a class="qa-item" href="#">
+                <div class="qa-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </div>
+                <div class="qa-body">
+                  <div class="qa-name">Copy invite link</div>
+                  <div class="qa-meta">Share manually to your teammates</div>
+                </div>
+                <div class="qa-chev" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </a>
+
+              <a class="qa-item" href="share_assessment.html">
+                <div class="qa-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                </div>
+                <div class="qa-body">
+                  <div class="qa-name">Add another teammate</div>
+                  <div class="qa-meta">Invite more people to take the assessment</div>
+                </div>
+                <div class="qa-chev" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </a>
+
+            </div>
+          </section>
+
+          <section class="next-card" aria-label="What happens next">
+            <div class="next-head">
+              <span class="pill mint" style="background: var(--color-surface);">What happens next</span>
+            </div>
+            <p class="next-text">Lumeir AI can help you synthesize themes across all answers.</p>
+          </section>
+
+        </div>
+
+      </div>
+
+      <div class="page-footer">
+        <a class="btn btn-secondary" href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </a>
+        <a class="btn btn-primary" href="synthesis_storage.html">Continue</a>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
